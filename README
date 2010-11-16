@@ -1,0 +1,14 @@
+Another chatbot, this one written in node.js. 
+Uses a mysql connection by default. 
+
+Edit bot.properties to configure bot. 
+
+Start with:
+node botboy.js - To start up bot normally
+node botboy.js shell - To start up bot and leave a repl open (play with 'bot' variable)
+node botboy.js shell noconnect - Same as above, but don't connect to IRC. Use this to debug message handling
+
+Dependencies included:
+http://github.com/gf3/IRC-js
+http://github.com/felixge/node-mysql
+
