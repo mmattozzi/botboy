@@ -2,7 +2,8 @@ var sys = require('sys'),
     IRC = require('./lib/irc-js/irc'),
     repl = require('repl'),
     fs = require('fs'),
-	addBehaviors = require('./behaviors');
+	addBehaviors = require('./behaviors'),
+	addLivelockAnswerer = require('./livelock');
 
 function Botboy(options, channel) {
 	this.client = null;
@@ -117,6 +118,7 @@ var options = {
 
 var bot = new Botboy(options, properties.bot.channel);
 addBehaviors(bot, properties);
+addLivelockAnswerer(bot, properties);
 
 if (process.argv[2] && process.argv[2] === "shell") {
 	repl.start('botboy> ').context.bot = bot;

@@ -1,7 +1,7 @@
 Another chatbot, this one written in node.js. 
 Uses a mysql connection by default. 
 
-Edit bot.properties to configure bot. 
+Edit bot.properties to configure bot. yahooId is optional, if present, yahoo answers API is used for some responses. 
 
 Start with:
 node botboy.js - To start up bot normally
