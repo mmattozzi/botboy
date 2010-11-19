@@ -11,7 +11,7 @@ function addLivelockAnswerer(bot, properties) {
 		if (check) {
 			sys.log("Making request");
 			var msg = check[1];
-			var req = digestClient.request("GET", "/api/public/mixtures?q=", { host: "antonym.subterfusion.net" });
+			var req = digestClient.request("GET", "/api/public/mixtures?q=" + querystring.escape(msg), { host: "antonym.subterfusion.net" });
 			var data = "";
 			req.addListener("response", function(response) {
 				response.setEncoding('utf8');
