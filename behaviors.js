@@ -14,6 +14,10 @@ function addBehaviors(bot, properties) {
 	var userEval = 1;
 	var yahooClient = http.createClient(80, 'answers.yahooapis.com');
 	
+	// Rate to mix in yahoo answers with stored responses
+	// 0.75 = 75% Yahoo answers, 25% stored responses
+	this.mix = 0.5;
+	
 	bot.addMessageListener("logger", function(nick, message) {
 		// Check to see if this is from a nick we shouldn't log
 		if (properties.mysql.logger.ignoreNicks.filter(function (x) { return nick.indexOf(x) > -1; }).length > 0) {
@@ -69,7 +73,7 @@ function addBehaviors(bot, properties) {
 	bot.addMessageListener("listen for name", function (nick, message) {
 		var re = new RegExp(properties.bot.nick);
 		if (re.test(message)) {
-			if (Math.random() > 0.5 && properties.yahooId) {
+			if (Math.random() < this.mix && properties.yahooId) {
 				yahooAnswer(message.replace(re, ''));
 			} else {
 				mysqlRandom();
@@ -78,6 +82,16 @@ function addBehaviors(bot, properties) {
 		} else {
 			return true;
 		}
+	});
+
+	bot.addMessageListener("adjust mix", function (nick, message) {
+		var test = message.match(/!mix ([0-9]*\.[0-9]+)/);
+		if (test) {
+			this.mix = test[1];
+			bot.say("Set mix to " + this.mix + " rate of yahoo answers.");
+			return false;
+		}
+		return true;
 	});
 
 	bot.addMessageListener("quoter", function (nick, message) {

@@ -29,7 +29,9 @@ function addLivelockAnswerer(bot, properties) {
 					}
 				});
 			});
+			return false;
 		}
+		return true;
 	});
 
 }
