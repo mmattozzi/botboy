@@ -25,7 +25,7 @@ function addLivelockAnswerer(bot, properties) {
 						var livelockRes = JSON.parse(data);
 						bot.say(livelockRes.body);
 					} else {
-						bot.say("livelock too slow");
+						bot.say("livelock fail: HTTP " + response.statusCode);
 					}
 				});
 			});

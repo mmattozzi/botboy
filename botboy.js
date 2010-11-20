@@ -3,7 +3,8 @@ var sys = require('sys'),
     repl = require('repl'),
     fs = require('fs'),
 	addBehaviors = require('./behaviors'),
-	addLivelockAnswerer = require('./livelock');
+	addLivelockAnswerer = require('./livelock'),
+	net = require('net');
 
 function Botboy(options, channel) {
 	this.client = null;
@@ -12,6 +13,7 @@ function Botboy(options, channel) {
 	this.messageListeners = [];
 	this.mlIndex = {};
 	this.joined = false;
+	this.lastMessage = "NONE";
 	
 	this.connect = function() {
 		sys.log("Creating new bot for channel " + this.channel);
@@ -49,6 +51,7 @@ function Botboy(options, channel) {
 		} else {
 			sys.log(message);
 		}
+		this.lastMessage = message;
 	};
 	
 	/**
@@ -147,6 +150,13 @@ process.on('SIGTERM', function() {
 	sys.log("Got SIGINT, disconnecting bot.");
 	onKill();
 });
+
+if (properties.replPort) {
+	sys.log("Starting remote REPL on port " + properties.replPort);
+	net.createServer(function (socket) {
+		repl.start("botboy via TCP socket> ", socket).context.bot = bot;
+	}).listen(properties.replPort);
+}
 
 // Given the shell argument, start up in a REPL
 if (process.argv[2] && process.argv[2] === "shell") {
