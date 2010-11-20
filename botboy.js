@@ -37,8 +37,10 @@ function Botboy(options, channel) {
 	};
 
 	this.disconnect = function() {
-		this.client.disconnect();
-		this.joined = false;
+		if (this.joined) {
+			this.client.disconnect();
+			this.joined = false;
+		}
 	};
 	
 	this.say = function(message) {
@@ -116,20 +118,34 @@ var options = {
 	}
 };
 
+fs.writeFileSync('shutdown.sh', "#!/bin/bash" + "\n" + "kill " + process.pid + "\n");
+fs.chmodSync('shutdown.sh', 33261);
+
 var bot = new Botboy(options, properties.bot.channel);
 addBehaviors(bot, properties);
 addLivelockAnswerer(bot, properties);
 
+var onKill = function() {
+	bot.disconnect();
+	try {
+		fs.unlinkSync('shutdown.sh');
+	} catch (err) { }
+	process.exit();
+};
+
 process.on('SIGHUP', function() {
 	sys.log("Got SIGHUP, disconnecting bot.");
-	bot.disconnect();
-	process.kill(process.pid);
+	onKill();
 });
 
 process.on('SIGINT', function() {
 	sys.log("Got SIGINT, disconnecting bot.");
-	bot.disconnect();
-	process.kill(process.pid);
+	onKill();
+});
+
+process.on('SIGTERM', function() {
+	sys.log("Got SIGINT, disconnecting bot.");
+	onKill();
 });
 
 // Given the shell argument, start up in a REPL
