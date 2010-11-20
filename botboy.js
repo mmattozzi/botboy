@@ -111,6 +111,11 @@ try {
 	throw err;
 }
 
+if (! properties.bot.nick) {
+	sys.log("Missing property information. Fill in bot.properties to get started!");
+	process.exit(1);
+}
+
 var options = { 
 	server: properties.bot.server, 
 	nick: properties.bot.nick, 

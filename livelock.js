@@ -1,5 +1,5 @@
 var querystring = require('querystring'),
-    digest = require('./digest'),
+    digest = require('./lib/digest/digest'),
     sys = require('sys');
 
 function addLivelockAnswerer(bot, properties) {
