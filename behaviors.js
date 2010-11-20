@@ -16,7 +16,7 @@ function addBehaviors(bot, properties) {
 	
 	// Rate to mix in yahoo answers with stored responses
 	// 0.75 = 75% Yahoo answers, 25% stored responses
-	this.mix = 0.5;
+	var mix = 0.5;
 	
 	bot.addMessageListener("logger", function(nick, message) {
 		// Check to see if this is from a nick we shouldn't log
@@ -73,9 +73,11 @@ function addBehaviors(bot, properties) {
 	bot.addMessageListener("listen for name", function (nick, message) {
 		var re = new RegExp(properties.bot.nick);
 		if (re.test(message)) {
-			if (Math.random() < this.mix && properties.yahooId) {
+			if (Math.random() < mix && properties.yahooId) {
+				sys.log("mix = " + mix + ", serving from yahoo answers");
 				yahooAnswer(message.replace(re, ''));
 			} else {
+				sys.log("mix = " + mix + ", serving from mysql");
 				mysqlRandom();
 			}
 			return false;
@@ -87,8 +89,8 @@ function addBehaviors(bot, properties) {
 	bot.addMessageListener("adjust mix", function (nick, message) {
 		var test = message.match(/!mix ([0-9]*\.[0-9]+)/);
 		if (test) {
-			this.mix = test[1];
-			bot.say("Set mix to " + this.mix + " rate of yahoo answers.");
+			mix = test[1];
+			bot.say("Set mix to " + mix + " rate of yahoo answers.");
 			return false;
 		}
 		return true;
