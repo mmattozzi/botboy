@@ -9,9 +9,10 @@ function addLivelockAnswerer(bot, properties) {
 	bot.addMessageListener("livelock", function (nick, message) {
 		var check = message.match(/!livelock(.*)/);
 		if (check) {
-			sys.log("Making request");
 			var msg = check[1];
-			var req = digestClient.request("GET", "/api/public/mixtures?q=" + querystring.escape(msg), { host: "antonym.subterfusion.net" });
+			var reqPath = "/api/public/mixtures?q=" + querystring.escape(msg);
+			sys.log("Livelock request: " + reqPath);
+			var req = digestClient.request("GET", reqPath, { host: "antonym.subterfusion.net" });
 			var data = "";
 			req.addListener("response", function(response) {
 				response.setEncoding('utf8');

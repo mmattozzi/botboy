@@ -120,10 +120,24 @@ var bot = new Botboy(options, properties.bot.channel);
 addBehaviors(bot, properties);
 addLivelockAnswerer(bot, properties);
 
+process.on('SIGHUP', function() {
+	sys.log("Got SIGHUP, disconnecting bot.");
+	bot.disconnect();
+	process.kill(process.pid);
+});
+
+process.on('SIGINT', function() {
+	sys.log("Got SIGINT, disconnecting bot.");
+	bot.disconnect();
+	process.kill(process.pid);
+});
+
+// Given the shell argument, start up in a REPL
 if (process.argv[2] && process.argv[2] === "shell") {
 	repl.start('botboy> ').context.bot = bot;
 }
 
+// Use noconnect for testing
 if (! process.argv[3] || process.argv[3] !== "noconnect") {
 	bot.connect();
 }
