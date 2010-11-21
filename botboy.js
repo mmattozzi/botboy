@@ -141,11 +141,6 @@ var onKill = function() {
 	process.exit();
 };
 
-process.on('SIGHUP', function() {
-	sys.log("Got SIGHUP, disconnecting bot.");
-	onKill();
-});
-
 process.on('SIGINT', function() {
 	sys.log("Got SIGINT, disconnecting bot.");
 	onKill();
