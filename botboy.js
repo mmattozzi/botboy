@@ -151,6 +151,10 @@ process.on('SIGTERM', function() {
 	onKill();
 });
 
+process.on('uncaughtException', function (err) {
+    sys.log('Caught exception: ' + err);
+});
+
 if (properties.replPort) {
 	sys.log("Starting remote REPL on port " + properties.replPort);
 	net.createServer(function (socket) {
