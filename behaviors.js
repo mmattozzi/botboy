@@ -124,7 +124,7 @@ function addBehaviors(bot, properties) {
                     sys.log("Error: " + err);
                 }
                 if (results.length > 0) {
-                    bot.say('#' + results[0].id + " " + results[0].message);
+                    bot.say('#' + results[0].id + " " + results[0].nick + ": " + results[0].message);
                 }
             });
             return false;
