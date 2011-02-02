@@ -200,6 +200,7 @@ function addBehaviors(bot, properties) {
                         if (defn) {
                             var resp = defn[1];
                             resp = resp.replace(/<[^>]*>/g, '');
+                            resp = resp.replace(/&quot;/g, '"');
                             bot.say(resp);
                             break;
                         }
