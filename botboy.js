@@ -162,6 +162,12 @@ if (properties.replPort) {
 	}).listen(properties.replPort);
 }
 
+if (properties.webrepl) {
+	var wr = require('webrepl');
+	var wrOpts = { 'username': properties.webrepl.username, 'password': properties.webrepl.password };
+	wr.start(properties.webrepl.port, wrOpts).context.bot = bot;
+}
+
 // Given the shell argument, start up in a REPL
 if (process.argv[2] && process.argv[2] === "shell") {
 	repl.start('botboy> ').context.bot = bot;
