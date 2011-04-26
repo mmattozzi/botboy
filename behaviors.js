@@ -3,13 +3,12 @@ var sys = require('sys'),
     Script = process.binding('evals').Script,
     MySQLClient = require('./MysqlWrapper'),
     http = require('http'),
-    querystring = require('querystring');
+    querystring = require('querystring'),
+    Persistence = require('./Persistence');
 
 function addBehaviors(bot, properties) {
     
-    var options = properties.mysql;
-    var mysql = new MySQLClient(options);
-    mysql.connect();
+    var persistence = new Persistence(properties);
     
     var userEval = 1;
     var yahooClient = http.createClient(80, 'answers.yahooapis.com');
@@ -17,29 +16,18 @@ function addBehaviors(bot, properties) {
     
     // Rate to mix in yahoo answers with stored responses
     // 0.75 = 75% Yahoo answers, 25% stored responses
-    var mix = 0.5;
+    var mix = 0;
     
     bot.addMessageListener("logger", function(nick, message) {
         // Check to see if this is from a nick we shouldn't log
-        if (properties.mysql.logger.ignoreNicks.filter(function (x) { return nick.indexOf(x) > -1; }).length > 0) {
+        if (properties.logger.ignoreNicks.filter(function (x) { return nick.indexOf(x) > -1; }).length > 0) {
             return true;
         }
         if (! (/^!/).test(message)) {
-            mysql.query("INSERT INTO messages (nick, message) VALUES (?, ?)", [nick, message]);
+            persistence.saveMessage(nick, message);
         }
         return true;
     });
-
-    var mysqlRandom = function() {
-        mysql.query("select * from messages where length(message) > 20 order by rand() limit 1", function(err, results, fields) {
-            if (err) {
-                sys.log("Error: " + err);
-            }
-            if (results.length > 0) {
-                bot.say(results[0].message);
-            }
-        });
-    };
 
     var yahooAnswer = function(message) {
         var url = '/AnswersService/V1/questionSearch?appid=' + properties.yahooId + 
@@ -61,11 +49,11 @@ function addBehaviors(bot, properties) {
                         bestAnswer = bestAnswer.substring(0, 400);
                         bot.say(bestAnswer);
                     } else {
-                        mysqlRandom();
+                        persistence.getRandom(bot);
                     }
                 } catch (err) {
                     sys.log(err);
-                    mysqlRandom();
+                    persistence.getRandom(bot);
                 }
             });
         });
@@ -79,7 +67,7 @@ function addBehaviors(bot, properties) {
                 yahooAnswer(message.replace(re, ''));
             } else {
                 sys.log("mix = " + mix + ", serving from mysql");
-                mysqlRandom();
+                persistence.getRandom(bot);
             }
             return false;
         } else {
@@ -101,14 +89,7 @@ function addBehaviors(bot, properties) {
         var check = message.match(/!do ([0-9A-Za-z_\-]*)/);
         if (check) {
             var doNick = check[1];
-            mysql.query("select * from messages where nick like '" + doNick + "' order by rand() limit 1", function(err, results, fields) {
-                if (err) {
-                    sys.log("Error: " + err);
-                }
-                if (results.length > 0) {
-                    bot.say('#' + results[0].id + " " + results[0].message);
-                }
-            });
+            persistence.getQuote(doNick, bot);
             return false;
         } else {
             return true;
@@ -119,14 +100,7 @@ function addBehaviors(bot, properties) {
         var check = message.match(/!msg ([0-9]*)/);
         if (check) {
             var id = check[1];
-            mysql.query("select * from messages where id = " + id, function(err, results, fields) {
-                if (err) {
-                    sys.log("Error: " + err);
-                }
-                if (results.length > 0) {
-                    bot.say('#' + results[0].id + " " + results[0].nick + ": " + results[0].message);
-                }
-            });
+            persistence.getMessage(id, bot);
             return false;
         } else {
             return true;
