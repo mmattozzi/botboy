@@ -109,7 +109,17 @@ function addBehaviors(bot, properties) {
     bot.addMessageListener("uds", function (nick, message) {
         var check = message.match(/!uds/);
         if (check) {
-            persistence.matchMessageForNick(nick, 'uds', bot);
+            persistence.matchMessage('uds', bot);
+            return false;
+        } else {
+            return true;
+        }
+    });
+
+    bot.addMessageListener("aevans", function (nick, message) {
+        var check = message.match(/!aevans/);
+        if (check) {
+            persistence.matchMessageForNick('aevans', '^so(\\s|,)', bot);
             return false;
         } else {
             return true;

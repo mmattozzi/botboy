@@ -25,7 +25,7 @@ function MongoBot() {
     };
     
     this.saveMessage = function(nick, message) {
-        if (this.mongoIrc && this.respond) {
+        if (this.mongoIrc) {
             // Use findAndModify to emulate auto increment behavior for msgId
             this.mongoSeq.findAndModify({ '_id': 'msgId' }, [], { '$inc': { 'seq': 1 }}, { 'upsert': true, 'new': true }, function (err, obj) {
                 var msgId = obj.seq;
@@ -75,8 +75,8 @@ function MongoBot() {
     
     this.matchMessage = function(str, bot) {
         if (this.mongoIrc && this.respond) {
-            this.mongoIrc.count({ 'message': '/' + str + '/'}, function(err, count) {
-                self.mongoIrc.find({ 'message': '/' + str + '/'}, { limit: -1, skip: Math.floor(Math.random() * count)}).toArray(function(err, docs) {
+            this.mongoIrc.count({ 'message': new RegExp(str) }, function(err, count) {
+                self.mongoIrc.find({ 'message': new RegExp(str) }, { limit: -1, skip: Math.floor(Math.random() * count)}).toArray(function(err, docs) {
                     if (docs.length > 0) {
                         bot.say('#' + docs[0].msgId + " " + docs[0].message);
                     }
@@ -87,8 +87,8 @@ function MongoBot() {
     
     this.matchMessageForNick = function(nick, str, bot) {
         if (this.mongoIrc && this.respond) {
-            this.mongoIrc.count({'nick': nick}, function(err, count) {
-                self.mongoIrc.find({ 'nick': nick, 'message': '/' + str + '/'}, { limit: -1, skip: Math.floor(Math.random() * count)}).toArray(function(err, docs) {
+            this.mongoIrc.count({'nick': nick, 'message': new RegExp(str) }, function(err, count) {
+                self.mongoIrc.find({ 'nick': nick, 'message': new RegExp(str) }, { limit: -1, skip: Math.floor(Math.random() * count)}).toArray(function(err, docs) {
                     if (docs.length > 0) {
                         bot.say('#' + docs[0].msgId + " " + docs[0].message);
                     }

@@ -12,7 +12,7 @@ function Persistence(properties) {
     }
     
     if (properties.mongodb) {
-        persistBots.push(new MongoBot().init(properties, (properties.mysql === null)));
+        persistBots.push(new MongoBot().init(properties, (properties.mysql == null)));
     }
     
     this.isActive = function() {
