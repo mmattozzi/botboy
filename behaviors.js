@@ -3,7 +3,7 @@ var sys = require('sys'),
     Script = process.binding('evals').Script,
     http = require('http'),
     querystring = require('querystring'),
-    Persistence = require('./persistence/Persistence');
+    Persistence = require('./persistence/persistence');
 
 function addBehaviors(bot, properties) {
     
@@ -15,7 +15,7 @@ function addBehaviors(bot, properties) {
     
     // Rate to mix in yahoo answers with stored responses
     // 0.75 = 75% Yahoo answers, 25% stored responses
-    var mix = 0;
+    var mix = 0.5;
     
     bot.addMessageListener("logger", function(nick, message) {
         // Check to see if this is from a nick we shouldn't log

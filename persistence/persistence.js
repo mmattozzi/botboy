@@ -1,6 +1,6 @@
 var sys = require('sys'),
-    MongoBot = require('./MongoBot'),
-    MysqlBot = require('./MysqlBot');
+    MongoBot = require('./mongobot'),
+    MysqlBot = require('./mysqlbot');
 
 function Persistence(properties) {
     
