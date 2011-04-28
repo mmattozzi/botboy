@@ -1,21 +1,14 @@
-var MySQLClient = require('./MysqlWrapper'),
-    sys = require('sys'),
+var sys = require('sys'),
     mongodb = require('mongodb');
 
-function Persistence(properties) {
-    this.mysql = null;
+function MongoBot() {
+    
     this.mongoIrc = null;
     this.mongoSeq = null;
+    this.respond = true;
     var self = this;
     
-    if (properties.mysql) {
-        console.log("Using mysql for persistence");
-        this.mysql = new MySQLClient(properties.mysql);
-        this.mysql.connect();
-    }
-    
-    if (properties.mongodb) {
-        console.log("Using mongodb for persistence");
+    this.init = function(properties, respond) {
         var server = new mongodb.Server(properties.mongodb.host, properties.mongodb.port, {});
         new mongodb.Db(properties.mongodb.database, server, {}).open(function (error, client) {
             if (error) {
@@ -23,19 +16,16 @@ function Persistence(properties) {
             }
             self.mongoIrc = new mongodb.Collection(client, 'messages');
             self.mongoSeq = new mongodb.Collection(client, 'seq');
+            self.respond = respond;
+            
+            sys.log("Using mongodb for persistence");
         });
-    }
-    
-    this.isActive = function() {
-        return (this.mysql !== null || this.mongoIrc !== null);
+        
+        return this;
     };
     
     this.saveMessage = function(nick, message) {
-        if (this.mysql) {
-            this.mysql.query("INSERT INTO messages (nick, message) VALUES (?, ?)", [nick, message]);
-        }
-        
-        if (this.mongoIrc) {
+        if (this.mongoIrc && this.respond) {
             // Use findAndModify to emulate auto increment behavior for msgId
             this.mongoSeq.findAndModify({ '_id': 'msgId' }, [], { '$inc': { 'seq': 1 }}, { 'upsert': true, 'new': true }, function (err, obj) {
                 var msgId = obj.seq;
@@ -49,16 +39,7 @@ function Persistence(properties) {
     };
     
     this.getRandom = function(bot) {
-        if (this.mysql) {
-            this.mysql.query("select * from messages where length(message) > 20 order by rand() limit 1", function(err, results, fields) {
-                if (err) {
-                    sys.log("Error: " + err);
-                }
-                if (results.length > 0) {
-                    bot.say(results[0].message);
-                }
-            });
-        } else if (this.mongoIrc) {
+        if (this.mongoIrc && this.respond) {
             this.mongoIrc.count({'length': { '$gte': 20 } }, function(err, count) {
                 self.mongoIrc.find({'length': { '$gte': 20 }}, { limit: -1, skip: Math.floor(Math.random() * count)}).toArray(function(err, docs) {
                     if (docs.length > 0) {
@@ -70,18 +51,10 @@ function Persistence(properties) {
     };
     
     this.getQuote = function(nick, bot) {
-        if (this.mysql) {
-            this.mysql.query("select * from messages where nick like '" + nick + "' order by rand() limit 1", function(err, results, fields) {
-                if (err) {
-                    sys.log("Error: " + err);
-                }
-                if (results.length > 0) {
-                    bot.say('#' + results[0].id + " " + results[0].message);
-                }
-            });
-        } else if (this.mongoIrc) {
+        if (this.mongoIrc && this.respond) {
             this.mongoIrc.count({'nick': nick}, function(err, count) {
                 self.mongoIrc.find({'nick': nick}, { limit: -1, skip: Math.floor(Math.random() * count)}).toArray(function(err, docs) {
+                    sys.log("found something");
                     if (docs.length > 0) {
                         bot.say('#' + docs[0].msgId + " " + docs[0].message);
                     }
@@ -91,16 +64,7 @@ function Persistence(properties) {
     };
     
     this.getMessage = function(msgId, bot) {
-        if (this.mysql) {
-            this.mysql.query("select * from messages where id = " + msgId, function(err, results, fields) {
-                if (err) {
-                    sys.log("Error: " + err);
-                }
-                if (results.length > 0) {
-                    bot.say('#' + results[0].id + " " + results[0].nick + ": " + results[0].message);
-                }
-            });
-        } else if (this.mongoIrc) {
+        if (this.mongoIrc && this.respond) {
             self.mongoIrc.find({'msgId': parseInt(msgId) }, {}).toArray(function(err, docs) {
                 if (docs.length > 0) {
                     bot.say('#' + docs[0].msgId + " " + docs[0].nick + ": " + docs[0].message);
@@ -108,7 +72,30 @@ function Persistence(properties) {
             });
         }
     };
+    
+    this.matchMessage = function(str, bot) {
+        if (this.mongoIrc && this.respond) {
+            this.mongoIrc.count({ 'message': '/' + str + '/'}, function(err, count) {
+                self.mongoIrc.find({ 'message': '/' + str + '/'}, { limit: -1, skip: Math.floor(Math.random() * count)}).toArray(function(err, docs) {
+                    if (docs.length > 0) {
+                        bot.say('#' + docs[0].msgId + " " + docs[0].message);
+                    }
+                });
+            });
+        }
+    };
+    
+    this.matchMessageForNick = function(nick, str, bot) {
+        if (this.mongoIrc && this.respond) {
+            this.mongoIrc.count({'nick': nick}, function(err, count) {
+                self.mongoIrc.find({ 'nick': nick, 'message': '/' + str + '/'}, { limit: -1, skip: Math.floor(Math.random() * count)}).toArray(function(err, docs) {
+                    if (docs.length > 0) {
+                        bot.say('#' + docs[0].msgId + " " + docs[0].message);
+                    }
+                });
+            });
+        }
+    };
 }
 
-module.exports = Persistence;
-
+module.exports = MongoBot;

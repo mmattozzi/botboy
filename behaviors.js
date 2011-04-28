@@ -1,10 +1,9 @@
 var sys = require('sys'), 
     child_process = require('child_process'),
     Script = process.binding('evals').Script,
-    MySQLClient = require('./MysqlWrapper'),
     http = require('http'),
     querystring = require('querystring'),
-    Persistence = require('./Persistence');
+    Persistence = require('./persistence/Persistence');
 
 function addBehaviors(bot, properties) {
     
@@ -101,6 +100,16 @@ function addBehaviors(bot, properties) {
         if (check) {
             var id = check[1];
             persistence.getMessage(id, bot);
+            return false;
+        } else {
+            return true;
+        }
+    });
+
+    bot.addMessageListener("uds", function (nick, message) {
+        var check = message.match(/!uds/);
+        if (check) {
+            persistence.matchMessageForNick(nick, 'uds', bot);
             return false;
         } else {
             return true;

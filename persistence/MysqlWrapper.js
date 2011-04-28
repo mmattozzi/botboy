@@ -1,5 +1,5 @@
 var sys = require('sys'),
-    MySQLClient = require('./lib/node-mysql').Client;
+    MySQLClient = require('../lib/node-mysql').Client;
 
 function MysqlWrapper(options) {
 	
