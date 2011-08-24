@@ -135,6 +135,31 @@ function addBehaviors(bot, properties) {
         }
         return true;
     });
+    
+    bot.addMessageListener("stocks", function (nick, message) {
+        var check = message.match(/!quote (.*)/);
+        if (check[1]) {
+            var url = '/d/quotes.csv?s=' + check[1] + '&f=b3c6k2';
+            var options = {
+                host: 'download.finance.yahoo.com',
+                port: 80,
+                path: url
+            };
+            var req = http.get(options, function(response) {
+                var data = "";
+                response.setEncoding("utf8");
+                response.on("data", function(chunk) {
+                    data += chunk;
+                });
+                response.on("end", function() {
+                    var cols = data.replace(/"/g, '').split(/,/);
+                    bot.say(check[1] + ' ' + cols[0] + ' ' + cols[1] + ' ' + cols[2].substr(6));
+                });
+            });
+            return false;
+        };
+        return true;
+    });
 
     bot.addMessageListener("toggle", function(nick, message) {
         var check = message.match(/!toggle (.*)/);
