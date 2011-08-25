@@ -138,7 +138,7 @@ function addBehaviors(bot, properties) {
     
     bot.addMessageListener("stocks", function (nick, message) {
         var check = message.match(/!quote (.*)/);
-        if (check[1]) {
+        if (check) {
             var url = '/d/quotes.csv?s=' + check[1] + '&f=b3c6k2';
             var options = {
                 host: 'download.finance.yahoo.com',
