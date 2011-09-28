@@ -29,6 +29,7 @@ function Botboy(options, channel) {
 			this.options.bot._onPrivMessage(message);
 		});
 
+        sys.log("Calling connect");
 		this.client.connect();
 	};
 
