@@ -127,6 +127,10 @@ var options = {
 	}
 };
 
+if (properties.bot.password) {
+	options.pass = properties.bot.password;
+}
+
 fs.writeFileSync('shutdown.sh', "#!/bin/bash" + "\n" + "kill " + process.pid + "\n");
 fs.chmodSync('shutdown.sh', 33261);
 
