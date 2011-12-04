@@ -106,6 +106,17 @@ function addBehaviors(bot, properties) {
         }
     });
 
+    bot.addMessageListener("about", function(nick, message) {
+        var check = message.match(/!about (.*)/);
+        if (check) {
+            var pattern = check[1];
+            persistence.matchMessage(pattern, bot);
+            return false;
+        } else {
+            return true;
+        }
+    });
+
     bot.addMessageListener("uds", function (nick, message) {
         var check = message.match(/!uds/);
         if (check) {
