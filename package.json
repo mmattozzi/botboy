@@ -1,0 +1,20 @@
+{
+    "name": "botboy",
+    "version": "1.0.0",
+    "author": "Mike Mattozzi <mike.mattozzi@gmail.com> (http://mikemattozzi.com)",
+    "description": "A node.js bot",
+    "homepage": "https://github.com/mmattozzi/botboy",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:mmattozzi/botboy.git"
+    },
+    "dependencies": {
+        "webrepl": "0.4.5",
+        "mysql": "0.9.5",
+        "irc": "0.3.3"
+    },
+    "engines": {
+        "node": ">=0.6.5"
+    },
+    "main": "./botboy.js"
+}

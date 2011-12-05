@@ -1,54 +1,58 @@
 var sys = require('sys'),
-    IRC = require('./lib/irc-js/irc'),
+    irc = require('irc'),
     repl = require('repl'),
     fs = require('fs'),
 	addBehaviors = require('./behaviors'),
 	addLivelockAnswerer = require('./livelock'),
 	net = require('net');
 
-function Botboy(options, channel) {
+function Botboy(properties) {
 	this.client = null;
-	this.options = options;
-	this.channel = channel;
+	this.options = {};
 	this.messageListeners = [];
 	this.mlIndex = {};
-	this.joined = false;
 	this.lastMessage = "NONE";
+	this.joined = false;
+	this.server = properties.bot.server;
 	
 	this.connect = function() {
-		sys.log("Creating new bot for channel " + this.channel);
-		this.options.bot = this;
-		this.client = new IRC(this.options || {});
+		sys.log("Creating new bot for channel " + properties.bot.channel);
 
-		// Add listeners for IRC messages. Inside the listener function
-		// this refers to the IRC object, not Botboy 
-		this.client.addListener('mode', function(message) {
-			this.options.bot._onModeMessage(message);
-		});
-		this.client.addListener('privmsg', function(message) {
-			this.options.bot._onPrivMessage(message);
-		});
+        var bot = this;
+        
+		this.options = {
+		    debug: true,
+            showErrors: true,
+            autoRejoin: true,
+            autoConnect: false,
+            password: properties.bot.password,
+            channels: [ properties.bot.channel ],
+		};
+		
+		this.client = new irc.Client(properties.bot.server, properties.bot.nick, this.options);
 
-        sys.log("Calling connect");
-		this.client.connect();
+        this.client.addListener('message' + properties.bot.channel, function (from, message) {
+            bot._onMessage(from, message);
+        });
+        
+        this.client.on('registered', function() {
+            sys.log("Connected to " + bot.server);
+            bot.joined = true;
+        });
+        
+        this.client.connect();
 	};
 
-	this.join = function() {
-		sys.log("Joining channel " + this.channel);
-		this.client.join(this.channel);
-		this.joined = true;
-	};
+    this.disconnect = function() {
+        sys.log("Processing disconnect request");
+        this.client.disconnect("410 Gone", function() {
+            sys.log("Disconnected from irc");
+        });
+    };
 
-	this.disconnect = function() {
-		if (this.joined) {
-			this.client.disconnect();
-			this.joined = false;
-		}
-	};
-	
 	this.say = function(message) {
 		if (this.joined) {
-			this.client.privmsg(this.channel, message);
+			this.client.say(this.options.channels[0], message);
 		} else {
 			sys.log(message);
 		}
@@ -82,13 +86,6 @@ function Botboy(options, channel) {
 		return this.mlIndex[name].active;
 	};
 	
-	this._onPrivMessage = function(message) {
-		sys.log("Got priv message: " + sys.inspect(message) );
-		if (message.params[0] === this.channel) {
-			this._onMessage(message.person.nick, message.params[1]);
-		}
-	};
-
 	this._onMessage = function(nick, message) {
 		for (var i = 0; i < this.messageListeners.length; i++) {
 			var ml = this.messageListeners[i];
@@ -99,10 +96,6 @@ function Botboy(options, channel) {
 		}
 	};
 
-	this._onModeMessage = function(message) {
-		sys.log("Got mode message!!" + sys.inspect(message) );
-		this.options.bot.join();
-	};
 }
 
 try {
@@ -117,32 +110,20 @@ if (! properties.bot.nick) {
 	process.exit(1);
 }
 
-var options = { 
-	server: properties.bot.server, 
-	nick: properties.bot.nick, 
-	user: {
-		username: properties.bot.nick, 
-		realname: properties.bot.nick, 
-		nickname: properties.bot.nick
-	}
-};
-
-if (properties.bot.password) {
-	options.pass = properties.bot.password;
-}
-
 fs.writeFileSync('shutdown.sh', "#!/bin/bash" + "\n" + "kill " + process.pid + "\n");
 fs.chmodSync('shutdown.sh', 33261);
 
-var bot = new Botboy(options, properties.bot.channel);
+var bot = new Botboy(properties);
 addBehaviors(bot, properties);
 addLivelockAnswerer(bot, properties);
 
 var onKill = function() {
-	bot.disconnect();
+	try {
+	    bot.disconnect();
+    } catch (err1) { }
 	try {
 		fs.unlinkSync('shutdown.sh');
-	} catch (err) { }
+	} catch (err2) { }
 	process.exit();
 };
 
