@@ -4,8 +4,8 @@ Another chatbot, this one written in node.js.
 
 Requires
 =================
-* node.js 0.2.4, 0.2.5
-* mysql database with the following table:
+node.js 0.2.4, 0.2.5
+Mysql database with the following table:
 
 	CREATE TABLE `messages` (
 	  `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -19,17 +19,17 @@ Requires
 	  KEY `i_date` (`date`)
 	)
 	
-* alternatively, a mongodb
+Alternatively, a mongodb.
 
 Configure
 =================
-* Download the dependencies by cd-ing into the botboy directory and running:
+Download the dependencies by cd-ing into the botboy directory and running:
 
     npm install
 
-* Edit bot.properties to configure bot. 
-  * yahooId is optional, if present, yahoo answers API is used for some responses. 
-  * replPort is optional, if present, a REPL socket will listen on the specified port
+Edit bot.properties to configure bot. 
+* yahooId is optional, if present, yahoo answers API is used for some responses. 
+* replPort is optional, if present, a REPL socket will listen on the specified port
 
 Run
 =================
