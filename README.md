@@ -5,6 +5,7 @@ Another chatbot, this one written in node.js.
 Requires
 =================
 node.js version >= 0.6.5
+
 Mysql database with the following table:
 
 	CREATE TABLE `messages` (
