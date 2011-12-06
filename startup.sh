@@ -1,2 +1,2 @@
 #!/bin/bash
-nohup node botboy.js &
+nohup npm start &

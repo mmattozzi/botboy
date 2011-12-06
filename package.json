@@ -9,12 +9,16 @@
         "url": "git@github.com:mmattozzi/botboy.git"
     },
     "dependencies": {
-        "webrepl": "0.4.5",
+        "webrepl": "0.4.6",
         "mysql": "0.9.5",
-        "irc": "0.3.3"
+        "irc": "0.3.3",
+        "mongodb": "0.9.7-1.4"
     },
     "engines": {
         "node": ">=0.6.5"
     },
-    "main": "./botboy.js"
+    "main": "./botboy.js",
+    "scripts": {
+        "start": "node botboy.js"
+    }
 }
