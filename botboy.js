@@ -29,6 +29,14 @@ function Botboy(properties) {
             channels: [ properties.bot.channel ],
 		};
 		
+		if (properties.bot.userName) {
+		    this.options.userName = properties.bot.userName;
+		}
+		
+		if (properties.bot.realName) {
+		    this.options.userName = properties.bot.realName;
+		}
+		
 		this.client = new irc.Client(properties.bot.server, properties.bot.nick, this.options);
 
         this.client.addListener('message' + properties.bot.channel, function (from, message) {
