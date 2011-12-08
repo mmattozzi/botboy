@@ -147,6 +147,14 @@ function addBehaviors(bot, properties) {
         return true;
     });
     
+    bot.addMessageListener("version", function (nick, message) {
+        if (message === "!version") {
+            bot.say("Node version = " + process.version);
+            return false;
+        }
+        return true;
+    });
+    
     bot.addMessageListener("stocks", function (nick, message) {
         var check = message.match(/!quote (.*)/);
         if (check) {
