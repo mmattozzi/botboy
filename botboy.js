@@ -34,7 +34,7 @@ function Botboy(properties) {
 		}
 		
 		if (properties.bot.realName) {
-		    this.options.userName = properties.bot.realName;
+		    this.options.realName = properties.bot.realName;
 		}
 		
 		this.client = new irc.Client(properties.bot.server, properties.bot.nick, this.options);
