@@ -26,7 +26,8 @@ function MysqlBot() {
         if (this.mysql && this.respond) {
             this.mysql.query("select * from messages where length(message) > 20 order by rand() limit 1", function(err, results, fields) {
                 if (err) {
-                    sys.log("Error: " + err);
+                    sys.log("Mysql Error: " + err);
+                    bot.say("Mysql has blown up my brain: " + err);
                 }
                 if (results.length > 0) {
                     bot.say(results[0].message);
@@ -39,7 +40,8 @@ function MysqlBot() {
         if (this.mysql && this.respond) {
             this.mysql.query("select * from messages where nick like '" + nick + "' order by rand() limit 1", function(err, results, fields) {
                 if (err) {
-                    sys.log("Error: " + err);
+                    sys.log("Mysql Error: " + err);
+                    bot.say("Mysql has blown up my brain: " + err);
                 }
                 if (results.length > 0) {
                     bot.say('#' + results[0].id + " " + results[0].message);
@@ -52,7 +54,8 @@ function MysqlBot() {
         if (this.mysql && this.respond) {
             this.mysql.query("select * from messages where id = " + msgId, function(err, results, fields) {
                 if (err) {
-                    sys.log("Error: " + err);
+                    sys.log("Mysql Error: " + err);
+                    bot.say("Mysql has blown up my brain: " + err);
                 }
                 if (results.length > 0) {
                     bot.say('#' + results[0].id + " " + results[0].nick + ": " + results[0].message);
@@ -65,7 +68,8 @@ function MysqlBot() {
         if (this.mysql && this.respond) {
             this.mysql.query("select * from messages where message regexp '" + str + "' order by rand() limit 1", function(err, results, fields) {
                 if (err) {
-                    sys.log("Error: " + err);
+                    sys.log("Mysql Error: " + err);
+                    bot.say("Mysql has blown up my brain: " + err);
                 }
                 if (results.length > 0) {
                     bot.say('#' + results[0].id + " " + results[0].message);
@@ -78,7 +82,8 @@ function MysqlBot() {
         if (this.mysql && this.respond) {
             this.mysql.query("select * from messages where nick like '" + nick + "' and message regexp '" + str + "' order by rand() limit 1", function(err, results, fields) {
                 if (err) {
-                    sys.log("Error: " + err);
+                    sys.log("Mysql Error: " + err);
+                    bot.say("Mysql has blown up my brain: " + err);
                 }
                 if (results.length > 0) {
                     bot.say('#' + results[0].id + " " + results[0].message);
