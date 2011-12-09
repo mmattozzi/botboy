@@ -1,10 +1,12 @@
 var sys = require('sys'),
     mysql = require('mysql');
 
+// Abstracts error handling and reconnects and requeries if the database connection is lost.
 function MysqlWrapper(options) {
     
     this.client = null;
     this.options = options;
+    var self = this;
     
     this.connect = function() {
         this.client = mysql.createClient({
@@ -13,7 +15,7 @@ function MysqlWrapper(options) {
             port: this.options.port
         });
         
-        this.client.useDatabase(this.options.database);
+        this.client.useDatabase(this.options.database);        
     };
     
     this.disconnect = function() {
@@ -25,16 +27,41 @@ function MysqlWrapper(options) {
         }
     };
     
-    this.query = function(qry, func) {
+    this.query = function() {
+        var qry = arguments[0];
+        var func = arguments[arguments.length - 1];
+        var boundValues = null;
+        if (arguments.length == 3) {
+            boundValues = arguments[1];
+        }
+        sys.log("Calling mysql query: " + qry);
         try {
-            this.client.query(qry, func);
-        } catch (err) {
-            sys.log("Error with mysql client: " + err);
-            sys.log(sys.inspect(err));
-            if (err.message === "No database selected") {
-                this.client.end();
-                this.connect();
+            var errorHandlingCallback = function(err, results, fields) {
+                if (err) {
+                    self.handleError(err, qry, func);
+                } else {
+                    func(results, fields);
+                }
+            };
+            if (boundValues) {
+                this.client.query(qry, boundValues, errorHandlingCallback);
+            } else {
+                this.client.query(qry, errorHandlingCallback);
             }
+        } catch (err) {
+            this.handleError(err);
+        }
+    };
+    
+    this.handleError = function(err, qry, func) {
+        sys.log("Error with mysql client: " + err);
+        sys.log(sys.inspect(err));
+        if (err.message === "No database selected") {
+            this.client.end();
+            this.connect();
+            
+            // Retry the query
+            this.query(qry, func);
         }
     };
     

@@ -147,6 +147,8 @@ process.on('SIGTERM', function() {
 
 process.on('uncaughtException', function (err) {
     sys.log('Caught exception: ' + err);
+    var stack = err.stack;
+    sys.puts(stack);
 });
 
 if (properties.replPort) {
