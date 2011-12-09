@@ -38,7 +38,7 @@ function MysqlWrapper(options) {
         try {
             var errorHandlingCallback = function(err, results, fields) {
                 if (err) {
-                    self.handleError(err, qry, func);
+                    self.handleError(err, qry, boundValues, func);
                 } else {
                     func(results, fields);
                 }
@@ -53,7 +53,7 @@ function MysqlWrapper(options) {
         }
     };
     
-    this.handleError = function(err, qry, func) {
+    this.handleError = function(err, qry, boundValues, func) {
         sys.log("Error with mysql client: " + err);
         sys.log(sys.inspect(err));
         if (err.message === "No database selected") {
@@ -61,7 +61,11 @@ function MysqlWrapper(options) {
             this.connect();
             
             // Retry the query
-            this.query(qry, func);
+            if (boundValues != null) {
+                this.query(qry, boundValues, func);
+            } else {
+                this.query(qry, func);
+            }
         }
     };
     
