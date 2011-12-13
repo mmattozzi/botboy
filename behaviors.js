@@ -74,112 +74,64 @@ function addBehaviors(bot, properties) {
         }
     });
 
-    bot.addMessageListener("adjust mix", function (nick, message) {
-        var test = message.match(/!mix ([0-9]*\.[0-9]+)/);
-        if (test) {
-            mix = test[1];
-            bot.say("Set mix to " + mix + " rate of yahoo answers.");
-            return false;
-        }
-        return true;
-    });
-
-    bot.addMessageListener("quoter", function (nick, message) {
-        var check = message.match(/!do ([0-9A-Za-z_\-]*)/);
-        if (check) {
-            var doNick = check[1];
-            persistence.getQuote(doNick, bot);
-            return false;
-        } else {
-            return true;
-        }
-    });
-
-    bot.addMessageListener("message recall", function (nick, message) {
-        var check = message.match(/!msg ([0-9]*)/);
-        if (check) {
-            var id = check[1];
-            persistence.getMessage(id, bot);
-            return false;
-        } else {
-            return true;
-        }
-    });
-
-    bot.addMessageListener("about", function(nick, message) {
-        var check = message.match(/!about (.*)/);
-        if (check) {
-            var pattern = check[1];
-            persistence.matchMessage(pattern, bot);
-            return false;
-        } else {
-            return true;
-        }
-    });
-
-    bot.addMessageListener("uds", function (nick, message) {
-        var check = message.match(/!uds/);
-        if (check) {
-            persistence.matchMessage('uds', bot);
-            return false;
-        } else {
-            return true;
-        }
-    });
-
-    bot.addMessageListener("aevans", function (nick, message) {
-        var check = message.match(/!aevans/);
-        if (check) {
-            persistence.matchMessageForNick('aevans', '^so(\\s|,)', bot);
-            return false;
-        } else {
-            return true;
-        }
-    });
-
-    bot.addMessageListener("uname", function (nick, message) {
-        if (message === "!uname") {
-            child_process.exec('uname -a', function(error, stdout, stderr) {
-                bot.say(stdout);
-            });
-            return false;
-        }
-        return true;
+    bot.addCommandListener("!do [nick]", /!do ([0-9A-Za-z_\-]*)/, "random quote", function(doNick) {
+        persistence.getQuote(doNick, bot);
     });
     
-    bot.addMessageListener("version", function (nick, message) {
-        if (message === "!version") {
-            bot.say("Node version = " + process.version);
-            return false;
-        }
-        return true;
+    bot.addCommandListener("!msg [#]", /!msg ([0-9]*)/, "message recall", function(id) {
+        persistence.getMessage(id, bot);
+    });
+
+    bot.addCommandListener("!about [pattern]", /!about (.*)/, "random message with phrase", function(pattern) {
+        persistence.matchMessage(pattern, bot);
+    });
+
+    bot.addCommandListener("!uds", /!uds/, "random message about uds", function() {
+        persistence.matchMessage('uds', bot);
+    });
+
+    bot.addCommandListener("!aevans", /!aevans/, "so, message from aevans", function() {
+        persistence.matchMessageForNick('aevans', '^so(\\s|,)', bot);
+    });
+
+    bot.addCommandListener("!uname", /!uname/, "information about host", function() {
+        child_process.exec('uname -a', function(error, stdout, stderr) {
+            bot.say(stdout);
+        });
+    });
+
+    bot.addCommandListener("!version", /!version/, "report node version", function() {
+        bot.say("Node version = " + process.version);
     });
     
-    bot.addMessageListener("stocks", function (nick, message) {
-        var check = message.match(/!quote (.*)/);
-        if (check) {
-            var url = '/d/quotes.csv?s=' + check[1] + '&f=b3c6k2';
-            var options = {
-                host: 'download.finance.yahoo.com',
-                port: 80,
-                path: url
-            };
-            var req = http.get(options, function(response) {
-                var data = "";
-                response.setEncoding("utf8");
-                response.on("data", function(chunk) {
-                    data += chunk;
-                });
-                response.on("end", function() {
-                    var cols = data.replace(/"/g, '').split(/,/);
-                    bot.say(check[1] + ' ' + cols[0] + ' ' + cols[1] + ' ' + cols[2].substr(6));
-                });
-            });
-            return false;
+    bot.addCommandListener("!help <cmd>", /!help(.*)/, "command help", function(cmd) {
+        if (cmd) {
+            bot.helpCommand(cmd);
+        } else {
+            bot.listCommands();
+        }
+    });
+    
+    bot.addCommandListener("!quote [symbol]", /!quote (.*)/, "get a stock quote", function(symbol) {
+        var url = '/d/quotes.csv?s=' + symbol + '&f=b3c6k2';
+        var options = {
+            host: 'download.finance.yahoo.com',
+            port: 80,
+            path: url
         };
-        return true;
+        var req = http.get(options, function(response) {
+            var data = "";
+            response.setEncoding("utf8");
+            response.on("data", function(chunk) {
+                data += chunk;
+            });
+            response.on("end", function() {
+                var cols = data.replace(/"/g, '').split(/,/);
+                bot.say(symbol + ' ' + cols[0] + ' ' + cols[1] + ' ' + cols[2].substr(6));
+            });
+        });
     });
-
+    
     bot.addMessageListener("toggle", function(nick, message) {
         var check = message.match(/!toggle (.*)/);
         if (check) {
@@ -215,40 +167,34 @@ function addBehaviors(bot, properties) {
         return true;
     });
         
-    bot.addMessageListener("urban dictionary", function(nick, message) {
-        var check = message.match(/!define (.*)/);
-        if (check) {
-            var msg = check[1];
-            var data = "";
-            var request = urbanClient.request('GET', '/define.php?term=' + querystring.escape(msg), 
-                { host: 'www.urbandictionary.com' } );
-            request.end();
-            request.on('response', function(response) {
-                response.setEncoding('utf8');
-                response.on('data', function(chunk) {
-                    data += chunk;
-                });
-                response.on('end', function() {
-                    bot.udData = data;
-                    data.replace(/\r/g, '');
-                    var lines = data.split(/\n/);
-                    for (var i in lines) {
-                        var defn = lines[i].match(/<div class="definition">(.*?)<\/div>/);
-                        if (defn) {
-                            var resp = defn[1];
-                            resp = resp.replace(/<[^>]*>/g, '');
-                            resp = resp.replace(/&quot;/g, '"');
-                            bot.say(resp);
-                            break;
-                        }
-                    }
-                });
+    bot.addCommandListener("!define [phrase]", /!define (.*)/, "urban definition of a word or phrase", function(msg) {
+        var data = "";
+        var request = urbanClient.request('GET', '/define.php?term=' + querystring.escape(msg), 
+            { host: 'www.urbandictionary.com' } );
+        request.end();
+        request.on('response', function(response) {
+            response.setEncoding('utf8');
+            response.on('data', function(chunk) {
+                data += chunk;
             });
-            
-            return false;
-        }
-        return true;
+            response.on('end', function() {
+                bot.udData = data;
+                data.replace(/\r/g, '');
+                var lines = data.split(/\n/);
+                for (var i in lines) {
+                    var defn = lines[i].match(/<div class="definition">(.*?)<\/div>/);
+                    if (defn) {
+                        var resp = defn[1];
+                        resp = resp.replace(/<[^>]*>/g, '');
+                        resp = resp.replace(/&quot;/g, '"');
+                        bot.say(resp);
+                        break;
+                    }
+                }
+            });
+        });
     });
+
 }
 
 module.exports = addBehaviors;

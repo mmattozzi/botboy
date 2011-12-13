@@ -14,6 +14,7 @@ function Botboy(properties) {
 	this.lastMessage = "NONE";
 	this.joined = false;
 	this.server = properties.bot.server;
+	this.commands = [];
 	
 	this.connect = function() {
 		sys.log("Creating new bot for channel " + properties.bot.channel);
@@ -80,6 +81,42 @@ function Botboy(properties) {
 		obj.active = true;
 		this.messageListeners.push(obj);
 		this.mlIndex[name] = obj;
+	};
+	
+	this.addCommandListener = function(name, pattern, description, func) {
+	    var f = function(nick, message) {
+	        var check = message.match(pattern);
+            if (check) {
+                var capture = check[1];
+                func(capture);
+                return false;
+            } else {
+                return true;
+            }
+	    };
+	    
+	    var m = name.match(/\!([a-z]*)/);
+	    var shortName = m[1];
+	    
+	    this.commands.push({ shortCommand: shortName, command: name, help: description });
+	    this.addMessageListener(name, f);
+	};
+	
+	this.listCommands = function() {
+	    var message = "Commands: ";
+	    for (var i = 0; i < this.commands.length; i++) {
+	        message += this.commands[i].shortCommand + " ";
+	    }
+	    this.say(message);
+	};
+	
+	this.helpCommand = function(cmd) {
+	    var choppedCmd = cmd.replace(/ /g, "");
+	    for (var i = 0; i < this.commands.length; i++) {
+	        if (this.commands[i].shortCommand === choppedCmd) {
+	            this.say(this.commands[i].command + " -- " + this.commands[i].help);
+	        }
+	    }
 	};
 	
 	this.toggleMessageListener = function(name) {
