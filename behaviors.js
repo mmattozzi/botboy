@@ -82,7 +82,7 @@ function addBehaviors(bot, properties) {
         persistence.getMessage(id, bot);
     });
 
-    bot.addCommandListener("!about [pattern]", /!about (.*)/, "random message with phrase", function(pattern) {
+    bot.addCommandListener("!about [regex pattern]", /!about (.*)/, "random message with phrase", function(pattern) {
         persistence.matchMessage(pattern, bot);
     });
 

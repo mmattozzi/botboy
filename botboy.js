@@ -38,6 +38,10 @@ function Botboy(properties) {
 		    this.options.realName = properties.bot.realName;
 		}
 		
+		if (properties.bot.port) {
+		    this.options.port = properties.bot.port;
+		}
+		
 		this.client = new irc.Client(properties.bot.server, properties.bot.nick, this.options);
 
         this.client.addListener('message' + properties.bot.channel, function (from, message) {

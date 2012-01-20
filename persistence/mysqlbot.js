@@ -54,9 +54,13 @@ function MysqlBot() {
     
     this.matchMessage = function(str, bot) {
         if (this.mysql && this.respond) {
+            var mysql_ = this.mysql;
             this.mysql.query("select * from messages where message regexp '" + str + "' order by rand() limit 1", function(results, fields) {
                 if (results.length > 0) {
-                    bot.say('#' + results[0].id + " " + results[0].message);
+                    var randResults = results;
+                    mysql_.query("select count(*) cnt from messages where message regexp '" + str + "'", function(results, fields) {
+                        bot.say('#' + randResults[0].id + " " + randResults[0].message + " [" + results[0].cnt + " match]");
+                    });
                 }
             });
         }
