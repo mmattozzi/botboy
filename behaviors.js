@@ -103,7 +103,7 @@ function addBehaviors(bot, properties) {
         if (match) {
             var start = match[1];
             var end = match[2];
-            if (end - start >= 9) {
+            if (end - start >= 10) {
                 bot.say("playback limited to 10 messages");
             } else if (start >= end) {
                 bot.say("start must be less than end");
