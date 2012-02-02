@@ -94,6 +94,10 @@ function addBehaviors(bot, properties) {
         persistence.matchMessageForNick('aevans', '^so(\\s|,)', bot);
     });
 
+    bot.addCommandListener("!leaders [start index]", /!leaders\s*(\d*)/, "top users by message count", function(index) {
+        persistence.leaders(index, bot);
+    });
+
     bot.addCommandListener("!uname", /!uname/, "information about host", function() {
         child_process.exec('uname -a', function(error, stdout, stderr) {
             bot.say(stdout);

@@ -75,6 +75,24 @@ function MysqlBot() {
             });
         }
     };
+    
+    this.leaders = function(index, bot) {
+        if (this.mysql && this.respond) {
+            if (! index) {
+                index = 0;
+            }
+            this.mysql.query("select nick, count(*) cnt from messages group by nick order by count(*) desc limit " + index + ",10", function(results, fields) {
+                if (results.length > 0) {
+                    var response = "";
+                    results.forEach(function(row) {
+                        response += row.nick + ": " + row.cnt + ", ";
+                    });
+                    response = response.slice(0, -2);
+                    bot.say(response);
+                }
+            });
+        }
+    };
 }
 
 module.exports = MysqlBot;

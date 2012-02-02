@@ -55,6 +55,12 @@ function Persistence(properties) {
             b.matchMessageForNick(nick, str, bot);
         });
     };
+    
+    this.leaders = function(index, bot) {
+        persistBots.forEach(function(b) {
+            b.leaders(index, bot);
+        });
+    };
 }
 
 module.exports = Persistence;
