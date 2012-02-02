@@ -56,6 +56,7 @@ function Persistence(properties) {
         });
     };
     
+    // Makes the bot printout users with the most messages
     this.leaders = function(index, bot) {
         persistBots.forEach(function(b) {
             b.leaders(index, bot);

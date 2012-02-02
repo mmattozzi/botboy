@@ -98,6 +98,23 @@ function addBehaviors(bot, properties) {
         persistence.leaders(index, bot);
     });
 
+    bot.addCommandListener("!playback start end", /!playback (\d+ \d+)/, "playback a series of messages", function(range) {
+        var match = range.match(/(\d+) (\d+)/);
+        if (match) {
+            var start = match[1];
+            var end = match[2];
+            if (end - start >= 9) {
+                bot.say("playback limited to 10 messages");
+            } else if (start >= end) {
+                bot.say("start must be less than end");
+            } else {
+                for (var i = start; i <= end; i++) {
+                    persistence.getMessage(i, bot);
+                }
+            }
+        }
+    });
+
     bot.addCommandListener("!uname", /!uname/, "information about host", function() {
         child_process.exec('uname -a', function(error, stdout, stderr) {
             bot.say(stdout);
