@@ -28,7 +28,8 @@ Download the dependencies by cd-ing into the botboy directory and running:
 
     npm install
 
-* Edit bot.properties to configure bot. 
+* Copy bot.properties.sample to bot.properties
+* Edit bot.properties to configure bot:
   * yahooId is optional, if present, yahoo answers API is used for some responses. 
   * replPort is optional, if present, a REPL socket will listen on the specified port
 
