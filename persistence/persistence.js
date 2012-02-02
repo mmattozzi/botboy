@@ -1,5 +1,4 @@
 var sys = require('sys'),
-    MongoBot = require('./mongobot'),
     MysqlBot = require('./mysqlbot');
 
 function Persistence(properties) {
@@ -9,10 +8,6 @@ function Persistence(properties) {
     
     if (properties.mysql) {
         persistBots.push(new MysqlBot().init(properties, true));
-    }
-    
-    if (properties.mongodb) {
-        persistBots.push(new MongoBot().init(properties, (properties.mysql == null)));
     }
     
     this.isActive = function() {

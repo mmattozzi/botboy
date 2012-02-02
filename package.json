@@ -11,8 +11,7 @@
     "dependencies": {
         "webrepl": "0.4.6",
         "mysql": "0.9.5",
-        "irc": "0.3.3",
-        "mongodb": "0.9.7-1.4"
+        "irc": "0.3.3"
     },
     "engines": {
         "node": ">=0.6.5"

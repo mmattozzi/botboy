@@ -19,8 +19,6 @@ Mysql database with the following table:
 	  KEY `classification` (`classification`),
 	  KEY `i_date` (`date`)
 	)
-	
-Alternatively, a mongodb.
 
 Configure
 =================
