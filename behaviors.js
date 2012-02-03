@@ -115,6 +115,10 @@ function addBehaviors(bot, properties) {
         }
     });
 
+    bot.addCommandListener("!stats nick", /!stats (.*)/, "stats about a user", function(nick) {
+        persistence.userStats(nick, bot);
+    });
+
     bot.addCommandListener("!uname", /!uname/, "information about host", function() {
         child_process.exec('uname -a', function(error, stdout, stderr) {
             bot.say(stdout);

@@ -62,6 +62,12 @@ function Persistence(properties) {
             b.leaders(index, bot);
         });
     };
+    
+    this.userStats = function(nick, bot) {
+        persistBots.forEach(function(b) {
+            b.userStats(nick, bot);
+        });
+    };
 }
 
 module.exports = Persistence;

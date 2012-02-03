@@ -93,6 +93,16 @@ function MysqlBot() {
             });
         }
     };
+    
+    this.userStats = function(nick, bot) {
+        if (this.mysql && this.respond) {
+            this.mysql.query("select avg(words) as avgwords, count(*) as total from (select nick, (length(message) - length(replace(message, ' ', '')) + 1) as words from messages) as wordcount where nick = ?", [nick], function(results, fields) {
+                if (results.length > 0 && results[0].total > 0) {
+                    bot.say('Total messages: ' + results[0].total + ', Average length: ' + results[0].avgwords + ' words');
+                }
+            });
+        }
+    };
 }
 
 module.exports = MysqlBot;
