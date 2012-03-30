@@ -164,14 +164,15 @@ fs.writeFileSync('shutdown.sh', "#!/bin/bash" + "\n" + "kill " + process.pid + "
 fs.chmodSync('shutdown.sh', 33261);
 
 var bot = new Botboy(properties);
-addBehaviors(bot, properties);
-addLivelockAnswerer(bot, properties);
 
 if (properties.randomAnswerer) {
     properties.randomAnswerer.forEach(function(answerer) {
         addFileBasedRandomAnswerer(bot, answerer.pattern, answerer.file);
     });
 }
+
+addBehaviors(bot, properties);
+addLivelockAnswerer(bot, properties);
 
 var onKill = function() {
 	try {
