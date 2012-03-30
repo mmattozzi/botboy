@@ -15,5 +15,8 @@
 		"ignoreNicks": [ "someOtherBot", "anotherBot" ]
 	},
 	"yahooId": "",
-	"replPort": 5001
+	"replPort": 5001,
+	"randomAnswerer": [
+	    { "pattern": "hello", "file": "greetings.txt" }
+	]
 }

@@ -4,6 +4,7 @@ var sys = require('sys'),
     fs = require('fs'),
 	addBehaviors = require('./behaviors'),
 	addLivelockAnswerer = require('./livelock'),
+	addFileBasedRandomAnswerer = require('./randomAnswerer'),
 	net = require('net');
 
 function Botboy(properties) {
@@ -165,6 +166,12 @@ fs.chmodSync('shutdown.sh', 33261);
 var bot = new Botboy(properties);
 addBehaviors(bot, properties);
 addLivelockAnswerer(bot, properties);
+
+if (properties.randomAnswerer) {
+    properties.randomAnswerer.forEach(function(answerer) {
+        addFileBasedRandomAnswerer(bot, answerer.pattern, answerer.file);
+    });
+}
 
 var onKill = function() {
 	try {
