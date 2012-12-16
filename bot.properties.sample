@@ -10,6 +10,7 @@
 		"database": "", 
 		"host": "localhost",
 		"port": "3306"
+		/* and, if local --  "socketPath" : "/tmp/mysql.sock" */
 	},
 	"logger": {
 		"ignoreNicks": [ "someOtherBot", "anotherBot" ]
@@ -18,5 +19,13 @@
 	"replPort": 5001,
 	"randomAnswerer": [
 	    { "pattern": "hello", "file": "greetings.txt" }
-	]
+	],
+	"reconnectOnETIMEDOUT": false,
+	/* See http://www.wunderground.com/weather/api/ or omit completely */
+	"wundergroundKey": "",
+	/* See http://water.weather.gov or omit completely */
+	"noaaRiverLevel": {
+		"riverCode": "",
+		"command": ""
+	}
 }

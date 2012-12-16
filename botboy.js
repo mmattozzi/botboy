@@ -4,6 +4,8 @@ var sys = require('sys'),
     fs = require('fs'),
 	addBehaviors = require('./behaviors'),
 	addLivelockAnswerer = require('./livelock'),
+	addRiverAnswerer = require('./river'),
+	addWeatherAnswerer = require('./weather'),
 	addFileBasedRandomAnswerer = require('./randomAnswerer'),
 	net = require('net');
 
@@ -26,6 +28,7 @@ function Botboy(properties) {
 		    debug: true,
             showErrors: true,
             autoRejoin: true,
+            retryDelay: 5000,
             autoConnect: false,
             password: properties.bot.password,
             channels: [ properties.bot.channel ],
@@ -173,6 +176,12 @@ if (properties.randomAnswerer) {
 
 addBehaviors(bot, properties);
 addLivelockAnswerer(bot, properties);
+if (properties.noaaRiverLevel) {
+	addRiverAnswerer(bot, properties, properties.noaaRiverLevel.riverCode, properties.noaaRiverLevel.command);
+}
+if (properties.wundergroundKey) {
+	addWeatherAnswerer(bot, properties, properties.wundergroundKey);
+}
 
 var onKill = function() {
 	try {
@@ -198,12 +207,14 @@ process.on('uncaughtException', function (err) {
     sys.log('Caught exception: ' + err);
     var stack = err.stack;
     sys.puts(stack);
-    if (err.message.indexOf("ETIMEDOUT") !== -1) {
-        sys.log("Attempting to reconnect bot in 5 seconds...");
-        setTimeout(function() {
-            bot.connect();
-        }, 5000);
-    }
+    if (properties.reconnectOnETIMEDOUT === true) {
+	    if (err.message.indexOf("ETIMEDOUT") !== -1) {
+	        sys.log("Attempting to reconnect bot in 5 seconds...");
+	        setTimeout(function() {
+	            bot.connect();
+	        }, 5000);
+	    }
+	}
 });
 
 if (properties.replPort) {
