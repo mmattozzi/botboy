@@ -5,6 +5,22 @@ var sys = require('sys'),
     querystring = require('querystring'),
     Persistence = require('./persistence/persistence');
 
+function msToString(ms) {
+    var str = "";
+    if (ms > 3600000) {
+        var hours = Math.floor(ms/3600000);
+        str += hours + " hours, ";
+        ms = ms - (hours*3600000);
+    }
+    if (ms > 60000) {
+        var minutes = Math.floor(ms/60000);
+        str += minutes + " minutes, ";
+        ms = ms - (minutes*60000);
+    }
+    str += Math.floor(ms/1000) + " seconds";
+    return str;
+}
+
 function addBehaviors(bot, properties) {
     
     var persistence = new Persistence(properties);
@@ -117,6 +133,45 @@ function addBehaviors(bot, properties) {
 
     bot.addCommandListener("!stats nick", /!stats (.*)/, "stats about a user", function(nick) {
         persistence.userStats(nick, bot);
+    });
+
+    bot.addCommandListener("!alarm <time> -m <message>", /!alarm (.* -m .*)/, "set an alarm, valid time examples: 5s, 5m, 5h, 10:00, 14:30, 2:30pm", function(timeString, nick) {
+        var matchInterval = timeString.match(/(\d+)([h|m|s]) -m (.*)/);
+        var matchTime = timeString.match(/(\d{1,2}):(\d{2})(am|pm){0,1} -m (.*)/);
+        if (matchInterval) {
+            var timeNumber = matchInterval[1];
+            var timeUnit = matchInterval[2];
+            var sleepTime = timeNumber;
+            if (timeUnit === 'h') {
+                sleepTime = sleepTime * 60 * 60 * 1000;
+            } else if (timeUnit === 'm') {
+                sleepTime = sleepTime  * 60 * 1000;
+            } else if (timeUnit === 's') {
+                sleepTime = sleepTime * 1000;
+            }
+            bot.say("Alarm will go off in " + msToString(sleepTime));
+            setTimeout(function() {
+                bot.say(nick + ': ' + matchInterval[3]);
+            }, sleepTime);
+        } else if (matchTime) {
+            var hour = matchTime[1];
+            var minute = matchTime[2];
+            if (matchTime[3] === 'pm') {
+                hour = parseInt(hour) + 12;
+                bot.say("Alarm set for hour " + hour);
+            }
+            var now = new Date();
+            var sleepTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0, 0) - now;
+            if (sleepTime < 0) {
+                sleepTime += 86400000;
+            }
+            bot.say("Alarm will go off in " + msToString(sleepTime));
+            setTimeout(function() {
+                bot.say(nick + ': ' + matchTime[4]);
+            }, sleepTime);
+        } else {
+            bot.say("Unknown time format!");
+        }
     });
 
     bot.addCommandListener("!uname", /!uname/, "information about host", function() {

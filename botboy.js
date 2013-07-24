@@ -96,7 +96,7 @@ function Botboy(properties) {
 	        var check = message.match(pattern);
             if (check) {
                 var capture = check[1];
-                func(capture);
+                func(capture, nick);
                 return false;
             } else {
                 return true;
