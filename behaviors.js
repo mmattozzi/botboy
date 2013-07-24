@@ -149,10 +149,14 @@ function addBehaviors(bot, properties) {
             } else if (timeUnit === 's') {
                 sleepTime = sleepTime * 1000;
             }
-            bot.say("Alarm will go off in " + msToString(sleepTime));
-            setTimeout(function() {
-                bot.say(nick + ': ' + matchInterval[3]);
-            }, sleepTime);
+            if (sleepTime < 2147483647) {
+                bot.say("Alarm will go off in " + msToString(sleepTime));
+                setTimeout(function() {
+                    bot.say(nick + ': ' + matchInterval[3]);
+                }, sleepTime);
+            } else {
+                bot.say("Delay exceeds maximum timeout, see: http://stackoverflow.com/questions/3468607/why-does-settimeout-break-for-large-millisecond-delay-values");
+            }
         } else if (matchTime) {
             var hour = matchTime[1];
             var minute = matchTime[2];
