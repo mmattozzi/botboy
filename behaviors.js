@@ -158,7 +158,6 @@ function addBehaviors(bot, properties) {
             var minute = matchTime[2];
             if (matchTime[3] === 'pm') {
                 hour = parseInt(hour) + 12;
-                bot.say("Alarm set for hour " + hour);
             }
             var now = new Date();
             var sleepTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0, 0) - now;
