@@ -158,10 +158,12 @@ function addBehaviors(bot, properties) {
                 bot.say("Delay exceeds maximum timeout, see: http://stackoverflow.com/questions/3468607/why-does-settimeout-break-for-large-millisecond-delay-values");
             }
         } else if (matchTime) {
-            var hour = matchTime[1];
+            var hour = parseInt(matchTime[1]);
             var minute = matchTime[2];
-            if (matchTime[3] === 'pm') {
-                hour = parseInt(hour) + 12;
+            if (matchTime[3] === 'pm' && hour != 12) {
+                hour = hour + 12;
+            } else if (matchTime[3] === 'am' && hour === 12) {
+                hour = 0;
             }
             var now = new Date();
             var sleepTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0, 0) - now;
