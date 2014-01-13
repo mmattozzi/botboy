@@ -263,18 +263,12 @@ function addBehaviors(bot, properties) {
                 data += chunk;
             });
             response.on('end', function() {
-                bot.udData = data;
-                data.replace(/\r/g, '');
-                var lines = data.split(/\n/);
-                for (var i in lines) {
-                    var defn = lines[i].match(/<div class="definition">(.*?)<\/div>/);
-                    if (defn) {
-                        var resp = defn[1];
-                        resp = resp.replace(/<[^>]*>/g, '');
-                        resp = resp.replace(/&quot;/g, '"');
-                        bot.say(resp);
-                        break;
-                    }
+                var defn = data.match(/<div class='definition'>[\r\n]*(.*?)[\r\n]*<\/div>/);
+                if (defn) {
+                    var resp = defn[1];
+                    resp = resp.replace(/<[^>]*>/g, '');
+                    resp = resp.replace(/&quot;/g, '"');
+                    bot.say(resp);
                 }
             });
         });
