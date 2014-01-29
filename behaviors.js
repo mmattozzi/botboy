@@ -263,7 +263,7 @@ function addBehaviors(bot, properties) {
                 data += chunk;
             });
             response.on('end', function() {
-                var defn = data.match(/<div class='definition'>[\r\n]*(.*?)[\r\n]*<\/div>/);
+                var defn = data.match(/<div class='meaning'>[\r\n]*(.*?)[\r\n]*<\/div>/);
                 if (defn) {
                     var resp = defn[1];
                     resp = resp.replace(/<[^>]*>/g, '');
