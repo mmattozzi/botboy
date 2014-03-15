@@ -11,7 +11,8 @@
     "dependencies": {
         "webrepl": "0.4.7",
         "mysql": "0.9.5",
-        "irc": "0.3.3"
+        "irc": "0.3.3",
+        "xml2js": "0.4.1"
     },
     "engines": {
         "node": ">=0.6.5"

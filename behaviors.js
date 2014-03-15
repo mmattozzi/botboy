@@ -3,7 +3,8 @@ var sys = require('sys'),
     Script = process.binding('evals').Script,
     http = require('http'),
     querystring = require('querystring'),
-    Persistence = require('./persistence/persistence');
+    Persistence = require('./persistence/persistence'),
+    xml2jsParser = require('xml2js').parseString;
 
 function msToString(ms) {
     var str = "";
@@ -198,9 +199,9 @@ function addBehaviors(bot, properties) {
     });
     
     bot.addCommandListener("!quote [symbol]", /!quote (.*)/, "get a stock quote", function(symbol) {
-        var url = '/d/quotes.csv?s=' + symbol + '&f=b3c6k2';
+        var url = '/Api/v2/Quote?symbol=' + symbol;
         var options = {
-            host: 'download.finance.yahoo.com',
+            host: 'dev.markitondemand.com',
             port: 80,
             path: url
         };
@@ -211,8 +212,26 @@ function addBehaviors(bot, properties) {
                 data += chunk;
             });
             response.on("end", function() {
-                var cols = data.replace(/"/g, '').split(/,/);
-                bot.say(symbol + ' ' + cols[0] + ' ' + cols[1] + ' ' + cols[2].substr(6));
+                xml2jsParser(data, function(err, result) {
+                    console.log(result);
+                    if (! result.Error && result.StockQuote.Status[0].indexOf('Failure') == -1) {
+                        var mktCap = parseInt(result.StockQuote.MarketCap[0]);
+                        var mktCapString = "";
+                        if (mktCap > 1000000000) {
+                            mktCapString = "$" + ((mktCap/1000000000).toFixed(2)) + "B";
+                        } else if (mktCap > 1000000) {
+                            mktCapString = "$" + ((mktCap/1000000).toFixed(2)) + "M";
+                        }
+                        var changePrefix = (result.StockQuote.Change[0] > 0) ? '+' : '';
+                        bot.say(result.StockQuote.Name[0] + ' ... ' + 
+                            '$' + result.StockQuote.LastPrice[0] + ' ' + 
+                            changePrefix + result.StockQuote.Change[0] + ' ' + 
+                            changePrefix + parseFloat(result.StockQuote.ChangePercent[0]).toFixed(2) + '% ' + 
+                            mktCapString);
+                    } else {
+                        bot.say("Unable to get a quote for " + symbol);
+                    }
+                });
             });
         });
     });
