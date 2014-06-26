@@ -12,10 +12,11 @@
         "webrepl": "0.4.7",
         "mysql": "0.9.5",
         "irc": "0.3.3",
-        "xml2js": "0.4.1"
+        "xml2js": "0.4.1",
+        "request": "2.36.0"
     },
     "engines": {
-        "node": ">=0.6.5"
+        "node": ">=0.8.0"
     },
     "main": "./botboy.js",
     "scripts": {

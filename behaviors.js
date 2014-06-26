@@ -276,11 +276,7 @@ function addBehaviors(bot, properties) {
         var request = require('request');
         request("http://api.urbandictionary.com/v0/define?term=" + querystring.escape(msg), function (error, response, body) {
           if (!error && response.statusCode == 200) {
-            console.log(body) // Print the google web page.
             var urbanresult = JSON.parse(body);
-            console.log(urbanresult.list[0]);
-            console.log("");
-            console.log(urbanresult.list[0].definition);
             bot.say(urbanresult.list[0].definition);
           }
         })
@@ -291,11 +287,7 @@ function addBehaviors(bot, properties) {
         var request = require('request');
         request("http://api.urbandictionary.com/v0/define?term=" + querystring.escape(msg), function (error, response, body) {
           if (!error && response.statusCode == 200) {
-            console.log(body) // Print the google web page.
             var urbanresult = JSON.parse(body);
-            console.log(urbanresult.list[0]);
-            console.log("");
-            console.log(urbanresult.list[0].definition);
             bot.say(urbanresult.list[0].example);
           }
         })
