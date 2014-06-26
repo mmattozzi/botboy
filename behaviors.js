@@ -28,7 +28,7 @@ function addBehaviors(bot, properties) {
     
     var userEval = 1;
     var yahooClient = http.createClient(80, 'answers.yahooapis.com');
-    var urbanClient = http.createClient(80, 'www.urbandictionary.com');
+
     
     // Rate to mix in yahoo answers with stored responses
     // 0.75 = 75% Yahoo answers, 25% stored responses
@@ -273,24 +273,32 @@ function addBehaviors(bot, properties) {
         
     bot.addCommandListener("!define [phrase]", /!define (.*)/, "urban definition of a word or phrase", function(msg) {
         var data = "";
-        var request = urbanClient.request('GET', '/define.php?term=' + querystring.escape(msg), 
-            { host: 'www.urbandictionary.com' } );
-        request.end();
-        request.on('response', function(response) {
-            response.setEncoding('utf8');
-            response.on('data', function(chunk) {
-                data += chunk;
-            });
-            response.on('end', function() {
-                var defn = data.match(/<div class='meaning'>[\r\n]*(.*?)[\r\n]*<\/div>/);
-                if (defn) {
-                    var resp = defn[1];
-                    resp = resp.replace(/<[^>]*>/g, '');
-                    resp = resp.replace(/&quot;/g, '"');
-                    bot.say(resp);
-                }
-            });
-        });
+        var request = require('request');
+        request("http://api.urbandictionary.com/v0/define?term=" + querystring.escape(msg), function (error, response, body) {
+          if (!error && response.statusCode == 200) {
+            console.log(body) // Print the google web page.
+            var urbanresult = JSON.parse(body);
+            console.log(urbanresult.list[0]);
+            console.log("");
+            console.log(urbanresult.list[0].definition);
+            bot.say(urbanresult.list[0].definition);
+          }
+        })
+    });
+
+    bot.addCommandListener("!example [phrase]", /!example (.*)/, "Use of urban definition of a word or phrase in a sentence", function(msg) {
+        var data = "";
+        var request = require('request');
+        request("http://api.urbandictionary.com/v0/define?term=" + querystring.escape(msg), function (error, response, body) {
+          if (!error && response.statusCode == 200) {
+            console.log(body) // Print the google web page.
+            var urbanresult = JSON.parse(body);
+            console.log(urbanresult.list[0]);
+            console.log("");
+            console.log(urbanresult.list[0].definition);
+            bot.say(urbanresult.list[0].example);
+          }
+        })
     });
 
 }
