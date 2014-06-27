@@ -308,6 +308,23 @@ function addBehaviors(bot, properties) {
           }
         })
     });
+
+    bot.addCommandListener("!firstworldproblems", /!firstworldproblems/, "Return a reddit first world problem", function(msg) {
+        var data = "";
+        var request = require('request');
+        request("http://www.reddit.com/r/firstworldproblems/.json", function (error, response, body) {
+          if (!error && response.statusCode == 200) {
+            //console.log(body) // Print the results
+            var firstworldproblem = JSON.parse(body);
+            // There are many returned in the json.  Get a count
+            var problemcount=firstworldproblem.data.children.length
+            var randomproblem=Math.floor((Math.random() * problemcount) + 1);
+            console.log("Found " + problemcount + " shower thoughts.  Randomly returning number " + randomproblem);
+            bot.say(firstworldproblem.data.children[randomproblem].data.title);
+          }
+        })
+    });
+
 }
 
 module.exports = addBehaviors;
