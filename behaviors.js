@@ -276,11 +276,7 @@ function addBehaviors(bot, properties) {
         var request = require('request');
         request("http://api.urbandictionary.com/v0/define?term=" + querystring.escape(msg), function (error, response, body) {
           if (!error && response.statusCode == 200) {
-            console.log(body) // Print the google web page.
             var urbanresult = JSON.parse(body);
-            console.log(urbanresult.list[0]);
-            console.log("");
-            console.log(urbanresult.list[0].definition);
             bot.say(urbanresult.list[0].definition);
           }
         })
@@ -291,16 +287,27 @@ function addBehaviors(bot, properties) {
         var request = require('request');
         request("http://api.urbandictionary.com/v0/define?term=" + querystring.escape(msg), function (error, response, body) {
           if (!error && response.statusCode == 200) {
-            console.log(body) // Print the google web page.
             var urbanresult = JSON.parse(body);
-            console.log(urbanresult.list[0]);
-            console.log("");
-            console.log(urbanresult.list[0].definition);
             bot.say(urbanresult.list[0].example);
           }
         })
     });
 
+    bot.addCommandListener("!showerthought", /!showerthought/, "Return a reddit shower thought", function(msg) {
+        var data = "";
+        var request = require('request');
+        request("http://www.reddit.com/r/showerthoughts/.json", function (error, response, body) {
+          if (!error && response.statusCode == 200) {
+            //console.log(body) // Print the results
+            var showerthought = JSON.parse(body);
+            // There are many returned in the json.  Get a count
+            var showercount=showerthought.data.children.length
+            var randomthought=Math.floor((Math.random() * showercount) + 1);
+            console.log("Found " + showercount + " shower thoughts.  Randomly returning number " + randomthought);
+            bot.say(showerthought.data.children[randomthought].data.title);
+          }
+        })
+    });
 }
 
 module.exports = addBehaviors;
