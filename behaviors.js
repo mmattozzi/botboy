@@ -199,7 +199,7 @@ function addBehaviors(bot, properties) {
     });
     
     bot.addCommandListener("!quote [symbol]", /!quote (.*)/, "get a stock quote", function(symbol) {
-        var url = '/Api/v2/Quote?symbol=' + symbol;
+        var url = '/MODApis/Api/v2/Quote?symbol=' + symbol;
         var options = {
             host: 'dev.markitondemand.com',
             port: 80,
