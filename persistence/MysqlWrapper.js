@@ -9,22 +9,20 @@ function MysqlWrapper(options) {
     var self = this;
     
     this.connect = function() {
-        this.client = mysql.createClient({
+        this.client = mysql.createPool({
+            connectionLimit: 10,
             user: this.options.user,
             password: this.options.password,
-            port: this.options.port
-        });
-        
-        this.client.useDatabase(this.options.database);        
+            host: 'localhost',
+            database: this.options.database
+        });        
     };
     
     this.disconnect = function() {
-        try {
-            this.client.end();
-        } catch (err) {
+        this.client.end(function(err) {
             sys.log("Error with mysql client: " + err);
             sys.log(sys.inspect(err));
-        }
+        });
     };
     
     this.query = function() {

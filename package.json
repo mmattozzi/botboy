@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "webrepl": "0.4.7",
-        "mysql": "0.9.5",
+        "mysql": "2.13.0",
         "irc": "0.3.3",
         "xml2js": "0.4.1",
         "request": "2.36.0"
