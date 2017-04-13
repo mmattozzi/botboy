@@ -16,7 +16,7 @@
         "request": "2.36.0"
     },
     "engines": {
-        "node": ">=0.8.0"
+        "node": ">=6.9.4"
     },
     "main": "./botboy.js",
     "scripts": {

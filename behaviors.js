@@ -1,6 +1,6 @@
 var sys = require('sys'), 
     child_process = require('child_process'),
-    Script = process.binding('evals').Script,
+    vm = require('vm'),
     http = require('http'),
     querystring = require('querystring'),
     Persistence = require('./persistence/persistence'),
@@ -258,7 +258,7 @@ function addBehaviors(bot, properties) {
             var mlName = "user eval " + userEval++;
             bot.addMessageListener(mlName, function(nick, message) {
                 var sandbox = { output: null, nick: nick, message: message };
-                Script.runInNewContext(msg, sandbox);
+                vm.runInNewContext(msg, sandbox);
                 if (sandbox.output) {
                     bot.say(sandbox.output);
                     return false;
