@@ -177,7 +177,9 @@ if (properties.randomAnswerer) {
 addBehaviors(bot, properties);
 addLivelockAnswerer(bot, properties);
 if (properties.noaaRiverLevel) {
-	addRiverAnswerer(bot, properties, properties.noaaRiverLevel.riverCode, properties.noaaRiverLevel.command);
+	for (var i = 0; i < properties.noaaRiverLevel.length; i++) {
+		addRiverAnswerer(bot, properties, properties.noaaRiverLevel[i].riverCode, properties.noaaRiverLevel[i].command);
+	}
 }
 if (properties.wundergroundKey) {
 	addWeatherAnswerer(bot, properties, properties.wundergroundKey);

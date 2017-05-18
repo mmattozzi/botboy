@@ -23,9 +23,11 @@
 	"reconnectOnETIMEDOUT": false,
 	/* See http://www.wunderground.com/weather/api/ or omit completely */
 	"wundergroundKey": "",
-	/* See http://water.weather.gov or omit completely */
-	"noaaRiverLevel": {
-		"riverCode": "",
-		"command": ""
-	}
+	/* See http://water.weather.gov or omit completely. Multiple rivers supported.  */
+	"noaaRiverLevel": [
+		{
+			"riverCode": "",
+			"command": ""
+		}
+	]
 }
