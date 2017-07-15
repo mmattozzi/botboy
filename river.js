@@ -16,7 +16,7 @@ function addRiverAnswerer(bot, properties, riverCode, command) {
                 data += chunk;
             });
             response.on('end', function() {
-                var match = data.match(/<valid timezone="UTC">2017-05-17T(\d\d:\d\d:\d\d)-00:00<\/valid><primary name="Stage" units="ft">(\d+\.\d+)<\/primary>/);
+                var match = data.match(/<valid timezone="UTC">\d+-\d+-\d+T(\d\d:\d\d:\d\d)-00:00<\/valid><primary name="Stage" units="ft">(\d+\.\d+)<\/primary>/);
                 if (match) {
                     bot.say("As of " + match[1] + " UTC, the river is at " + match[2] + " feet.");
                 }
