@@ -4,7 +4,7 @@ Another chatbot, this one written in node.js.
 
 Requires
 =================
-node.js version >= 0.6.5  
+node.js version >= 5.8.0
 
 Mysql database with the following table:
 
