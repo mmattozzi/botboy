@@ -1,9 +1,10 @@
-var sys = require('sys'), 
+var sys = require('sys'),
     child_process = require('child_process'),
     vm = require('vm'),
     http = require('http'),
     querystring = require('querystring'),
     Persistence = require('./persistence/persistence'),
+    request = require('request'),
     xml2jsParser = require('xml2js').parseString;
 
 function msToString(ms) {
@@ -23,17 +24,17 @@ function msToString(ms) {
 }
 
 function addBehaviors(bot, properties) {
-    
+
     var persistence = new Persistence(properties);
-    
+
     var userEval = 1;
     var yahooClient = http.createClient(80, 'answers.yahooapis.com');
 
-    
+
     // Rate to mix in yahoo answers with stored responses
     // 0.75 = 75% Yahoo answers, 25% stored responses
     var mix = 0.5;
-    
+
     bot.addMessageListener("logger", function(nick, message) {
         // Check to see if this is from a nick we shouldn't log
         if (properties.logger.ignoreNicks.filter(function (x) { return nick.indexOf(x) > -1; }).length > 0) {
@@ -46,7 +47,7 @@ function addBehaviors(bot, properties) {
     });
 
     var yahooAnswer = function(message) {
-        var url = '/AnswersService/V1/questionSearch?appid=' + properties.yahooId + 
+        var url = '/AnswersService/V1/questionSearch?appid=' + properties.yahooId +
             "&query=" + querystring.escape(message) + "&type=resolved&output=json";
         sys.log("Calling " + url);
         var request = yahooClient.request('GET', url, { host: 'answers.yahoo.com' });
@@ -94,7 +95,7 @@ function addBehaviors(bot, properties) {
     bot.addCommandListener("!do [nick]", /!do ([0-9A-Za-z_\-]*)/, "random quote", function(doNick) {
         persistence.getQuote(doNick, bot);
     });
-    
+
     bot.addCommandListener("!msg [#]", /!msg ([0-9]*)/, "message recall", function(id) {
         persistence.getMessage(id, bot);
     });
@@ -189,7 +190,7 @@ function addBehaviors(bot, properties) {
     bot.addCommandListener("!version", /!version/, "report node version", function() {
         bot.say("Node version = " + process.version);
     });
-    
+
     bot.addCommandListener("!help <cmd>", /!help(.*)/, "command help", function(cmd) {
         if (cmd) {
             bot.helpCommand(cmd);
@@ -197,45 +198,32 @@ function addBehaviors(bot, properties) {
             bot.listCommands();
         }
     });
-    
+
     bot.addCommandListener("!quote [symbol]", /!quote (.*)/, "get a stock quote", function(symbol) {
-        var url = '/MODApis/Api/v2/Quote?symbol=' + symbol;
-        var options = {
-            host: 'dev.markitondemand.com',
-            port: 80,
-            path: url
-        };
-        var req = http.get(options, function(response) {
-            var data = "";
-            response.setEncoding("utf8");
-            response.on("data", function(chunk) {
-                data += chunk;
-            });
-            response.on("end", function() {
-                xml2jsParser(data, function(err, result) {
-                    console.log(result);
-                    if (! result.Error && result.StockQuote.Status[0].indexOf('Failure') == -1) {
-                        var mktCap = parseInt(result.StockQuote.MarketCap[0]);
-                        var mktCapString = "";
-                        if (mktCap > 1000000000) {
-                            mktCapString = "$" + ((mktCap/1000000000).toFixed(2)) + "B";
-                        } else if (mktCap > 1000000) {
-                            mktCapString = "$" + ((mktCap/1000000).toFixed(2)) + "M";
-                        }
-                        var changePrefix = (result.StockQuote.Change[0] > 0) ? '+' : '';
-                        bot.say(result.StockQuote.Name[0] + ' ... ' + 
-                            '$' + result.StockQuote.LastPrice[0] + ' ' + 
-                            changePrefix + result.StockQuote.Change[0] + ' ' + 
-                            changePrefix + parseFloat(result.StockQuote.ChangePercent[0]).toFixed(2) + '% ' + 
-                            mktCapString);
-                    } else {
-                        bot.say("Unable to get a quote for " + symbol);
-                    }
-                });
-            });
+        var url = 'https://api.iextrading.com/1.0/stock/' + symbol + '/batch?types=quote';
+        request(url, function(error, response, body) {
+          if (error) { console.log(error); }
+          var result = JSON.parse(body);
+          if (! error && result.quote && result.quote.latestPrice) {
+              var mktCap = result.quote.marketCap;
+              var mktCapString = "";
+              if (mktCap > 1000000000) {
+                  mktCapString = "$" + ((mktCap/1000000000).toFixed(2)) + "B";
+              } else if (mktCap > 1000000) {
+                  mktCapString = "$" + ((mktCap/1000000).toFixed(2)) + "M";
+              }
+              var changePrefix = (result.quote.change > 0) ? '+' : '';
+              bot.say(result.quote.companyName + ' ... ' +
+                  '$' + String(result.quote.latestPrice) + ' ' +
+                  changePrefix + String(result.quote.change) + ' ' +
+                  changePrefix + String(result.quote.changePercent.toFixed(2)) + '% ' +
+                  mktCapString);
+          } else {
+              bot.say("Unable to get a quote for " + symbol);
+          }
         });
     });
-    
+
     bot.addMessageListener("toggle", function(nick, message) {
         var check = message.match(/!toggle (.*)/);
         if (check) {
@@ -270,7 +258,7 @@ function addBehaviors(bot, properties) {
         }
         return true;
     });
-        
+
     bot.addCommandListener("!define [phrase]", /!define (.*)/, "urban definition of a word or phrase", function(msg) {
         var data = "";
         var request = require('request');
