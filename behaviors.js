@@ -216,7 +216,7 @@ function addBehaviors(bot, properties) {
               bot.say(result.quote.companyName + ' ... ' +
                   '$' + String(result.quote.latestPrice) + ' ' +
                   changePrefix + String(result.quote.change) + ' ' +
-                  changePrefix + String(result.quote.changePercent.toFixed(2)) + '% ' +
+                  changePrefix + String((result.quote.changePercent * 100).toFixed(2)) + '% ' +
                   mktCapString);
           } else {
               bot.say("Unable to get a quote for " + symbol);
