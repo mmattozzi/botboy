@@ -3,7 +3,6 @@ var sys = require('sys'),
     repl = require('repl'),
     fs = require('fs'),
 	addBehaviors = require('./behaviors'),
-	addLivelockAnswerer = require('./livelock'),
 	addRiverAnswerer = require('./river'),
 	addWeatherAnswerer = require('./weather'),
 	addFileBasedRandomAnswerer = require('./randomAnswerer'),
@@ -175,7 +174,6 @@ if (properties.randomAnswerer) {
 }
 
 addBehaviors(bot, properties);
-addLivelockAnswerer(bot, properties);
 if (properties.noaaRiverLevel) {
 	for (var i = 0; i < properties.noaaRiverLevel.length; i++) {
 		addRiverAnswerer(bot, properties, properties.noaaRiverLevel[i].riverCode, properties.noaaRiverLevel[i].command);

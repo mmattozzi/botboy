@@ -28,9 +28,7 @@ function addBehaviors(bot, properties) {
     var persistence = new Persistence(properties);
 
     var userEval = 1;
-    var yahooClient = http.createClient(80, 'answers.yahooapis.com');
-
-
+    
     // Rate to mix in yahoo answers with stored responses
     // 0.75 = 75% Yahoo answers, 25% stored responses
     var mix = 0.5;
@@ -47,32 +45,23 @@ function addBehaviors(bot, properties) {
     });
 
     var yahooAnswer = function(message) {
-        var url = '/AnswersService/V1/questionSearch?appid=' + properties.yahooId +
+        var url = 'http://answers.yahoo.com/AnswersService/V1/questionSearch?appid=' + properties.yahooId +
             "&query=" + querystring.escape(message) + "&type=resolved&output=json";
         sys.log("Calling " + url);
-        var request = yahooClient.request('GET', url, { host: 'answers.yahoo.com' });
-        request.end();
-        var data = '';
-        request.on('response', function(response) {
-            response.setEncoding('utf8');
-            response.on('data', function(chunk) {
-                data += chunk;
-            });
-            response.on('end', function() {
-                try {
-                    var yahooResponse = JSON.parse(data);
-                    if (yahooResponse.all.count > 0) {
-                        var bestAnswer = yahooResponse.all.questions[0].ChosenAnswer;
-                        bestAnswer = bestAnswer.substring(0, 400);
-                        bot.say(bestAnswer);
-                    } else {
-                        persistence.getRandom(bot);
-                    }
-                } catch (err) {
-                    sys.log(err);
+        request(url, function(error, response, body) {
+            try {
+                var yahooResponse = JSON.parse(body);
+                if (yahooResponse.all.count > 0) {
+                    var bestAnswer = yahooResponse.all.questions[0].ChosenAnswer;
+                    bestAnswer = bestAnswer.substring(0, 400);
+                    bot.say(bestAnswer);
+                } else {
                     persistence.getRandom(bot);
                 }
-            });
+            } catch (err) {
+                sys.log(err);
+                persistence.getRandom(bot);
+            }
         });
     };
 
