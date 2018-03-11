@@ -6,6 +6,16 @@ Requires
 =================
 node.js version >= 5.8.0
 
+ICU library. See [installation notes](https://github.com/mooz/node-icu-charset-detector#installing-icu) in the `node-icu-charset-detector` project. This is a dependency of [node-irc](https://github.com/martynsmith/node-irc).
+For macOS:
+
+    brew install icu4c
+    brew link icu4c --force
+
+For Ubuntu:
+
+    apt-get install libicu-dev
+
 Mysql database with the following table:
 
 	CREATE TABLE `messages` (
